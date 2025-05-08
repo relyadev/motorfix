@@ -1,0 +1,20 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="{% static 'browser@4.js' %}"></script>
+  </head>
+  <body>
+
+    <a style="color: red;" href="{% url 'main' %}">Главная</a>
+    <a style="color: red;" href="{% url 'garage' %}">Гараж</a>
+    <a style="color: red;" href="{% url 'history' %}">История</a>
+    <a style="color: red;" href="{% url 'order' %}">Запись</a>
+    <hr>
+    {% block content %}
+
+    {% endblock %}
+  </body>
+</html>

@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% if orders %}
+{% for i in orders %}
+<hr>
+<ul>
+    <li>Автомобиль: {{ i.car.brand }}</li>
+    <li>Статус: {{ i.status }}</li>
+    <li>Дата создания: {{ i.date_of_repair }}</li>
+    <li>Описание ремонта: {{ i.description_repair }}</li>
+</ul>
+<hr>
+{% endfor %}
+{% else %}
+<h2>История пустая:(</h2>
+{% endif %}
+{% endblock %}

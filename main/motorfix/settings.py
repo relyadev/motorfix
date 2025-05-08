@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -31,13 +32,13 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
-    'app',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'app'
 ]
 
 MIDDLEWARE = [
@@ -67,6 +68,8 @@ TEMPLATES = [
     },
 ]
 
+# AUTHENTICATION_BACKENDS = ["django.contrib.auth.backends.ModelBackend"]
+AUTH_USER_MODEL = "app.Client"
 WSGI_APPLICATION = 'motorfix.wsgi.application'
 
 
@@ -123,4 +126,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGOUT_REDIRECT_URL = '/auth/login' # Перенаправление после выхода
 LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = "/auth/login"
-AUTH_USER_MODEL = "/home/relya/motorfix/main/app/models.py"
+
+# MEDIA_ROOT =  os.path.join(BASE_DIR, 'uploads')
+MEDIA_URL = '/uploads/'
+MEDIA_ROOT = BASE_DIR /'uploads'
+
