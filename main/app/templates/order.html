@@ -3,12 +3,6 @@
 {% block content %}
 <form action="{% url 'add_order' %}" method="POST">
     {% csrf_token %}
-    {% comment %} <select name="car">
-        {% for i in cars %}
-        <option value="{{ i.brand }}">{{  i.brand }}</option>
-        {% endfor %}
-    </select>
-    <input type="text" name="description"> {% endcomment %}
     {{ form.as_p }}
     <button type="submit">Записаться</button>
 </form>

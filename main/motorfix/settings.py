@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+
 from pathlib import Path
 import os
 
@@ -131,3 +132,10 @@ LOGIN_URL = "/auth/login"
 MEDIA_URL = '/uploads/'
 MEDIA_ROOT = BASE_DIR /'uploads'
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 465
+EMAIL_USE_SSL = True
+EMAIL_HOST_USER = "relyadev@gmail.com"
+EMAIL_HOST_PASSWORD = "cdmm qnup ghol fpir"
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

@@ -3,24 +3,26 @@
 {% block content %}
   <br />
 
-  <button>Дообавить машину</button>
   <form action="{% url 'add_car' %}" method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit">Дообавить</button>
+    <button type="submit">Добавить</button>
   </form>
   {% if cars %}
   {% for i in cars %}
   <hr>
     <ul>
-
       <li>Марка: {{ i.brand }}</li>
       <li>Год выпуска: {{ i.year_of_issue }}</li>
       <li>Пробег: {{ i.mileage }}</li>
       <li>VIN: {{ i.VIN }}</li>
       <img src="http://{{ request.get_host }}/uploads/{{ i.image_car }}" alt="" />
-      <form action="{% url 'car_delete' %}" method="POST">
+      <form action="{% url 'car_delete' i.id %}" method="POST">
+        {% csrf_token %}
         <button type="submit">Удалить автомобиль</button>
+      </form>
+      <form action="{% url 'car_update' i.id%}">
+        <button type="submit">Обновить автомобиль</button>
       </form>
     </ul>
   {% endfor %}
@@ -28,3 +30,4 @@
   <h2>Нет машин:(</h2>
   {% endif %}
 {% endblock %}
+
