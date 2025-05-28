@@ -1,1 +1,4 @@
 /.venv/
+/main/uploads/
+/main/app/__pycache__/
+/main/motorfix/__pycache__/
