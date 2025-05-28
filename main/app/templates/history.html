@@ -1,18 +1,22 @@
 {% extends 'base.html' %}
 
 {% block content %}
-{% if orders %}
-{% for i in orders %}
-<hr>
-<ul>
-    <li>Автомобиль: {{ i.car.brand }}</li>
-    <li>Статус: {{ i.status }}</li>
-    <li>Дата создания: {{ i.date_of_repair }}</li>
-    <li>Описание ремонта: {{ i.description_repair }}</li>
-</ul>
-<hr>
-{% endfor %}
-{% else %}
-<h2>История пустая:(</h2>
-{% endif %}
+<main class="container mx-auto px-4 pt-12">
+    {% if orders %}
+    <div class="space-y-6">
+        {% for i in orders %}
+        <div class="bg-[#2A2A2A] rounded-xl p-6 shadow-md">
+            <h3 class="text-xl font-semibold text-[#FF9920] mb-4">Автомобиль: {{ i.car.brand }}</h3>
+            <ul class="text-gray-300 space-y-2 list-disc list-inside">
+                <li><span class="font-medium text-gray-400">Статус:</span> {{ i.status }}</li>
+                <li><span class="font-medium text-gray-400">Дата создания:</span> {{ i.date_of_repair }}</li>
+                <li><span class="font-medium text-gray-400">Описание ремонта:</span> {{ i.description_repair }}</li>
+            </ul>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <h2 class="text-center text-gray-500 text-2xl mt-24">История пустая :(</h2>
+    {% endif %}
+</main>
 {% endblock %}

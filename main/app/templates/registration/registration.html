@@ -1,15 +1,22 @@
+{% load widget_tweaks %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Регистрация</title>
+    <script src="https://cdn.tailwindcss.com"></script>
   </head>
-  <body>
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Зарегистрироваться</button>
+  <body class="bg-gray-900 flex items-center justify-center min-h-screen p-4">
+    <form method="POST" class="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md">
+      {% csrf_token %}
+      <h2 class="text-3xl font-semibold text-yellow-500 mb-6 text-center">Регистрация</h2>
+      <div class="space-y-4">
+        {{ form.as_p|safe }}
+      </div>
+      <button type="submit" class="mt-6 w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-semibold py-3 rounded-md transition">
+        Зарегистрироваться
+      </button>
     </form>
   </body>
 </html>

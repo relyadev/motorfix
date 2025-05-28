@@ -7,16 +7,16 @@ import datetime
 class RegistrationForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)
     password_confrim = forms.CharField(
-        widget = forms.PasswordInput, 
+        widget = forms.PasswordInput,
         label = "Confrim password")
-    
+
     class Meta:
         model = Client
         fields = [
-            "first_name", 
-            "last_name", 
-            "email", 
-            "password", 
+            "first_name",
+            "last_name",
+            "email",
+            "password",
             "phone_number"
         ]
 
@@ -31,13 +31,13 @@ class RegistrationForm(forms.ModelForm):
         if Client.objects.filter(email=email).exists():
             raise forms.ValidationError("Это email уже существует")
         return cleaned_data
-    
+
 
 class LoginForm(AuthenticationForm):
     username = forms.EmailField(widget=forms.EmailInput(), label="Email")
 
 class AddCarForm(forms.ModelForm):
-    year_of_issue = forms.SelectDateWidget(years=range(1900, datetime.datetime.today().year))
+
     class Meta:
         model = Car
         fields = ["brand",
@@ -46,20 +46,25 @@ class AddCarForm(forms.ModelForm):
             "year_of_issue",
             "image_car"
         ]
+        
     def clean(self):
-        cleaned_data = self.cleaned_data
+        cleaned_data = super().clean()
         vin = cleaned_data.get("VIN")
         if re.match("/[A-HJ-NPR-Z0-9]{17}/i", vin):
             raise forms.ValidationError("Некорректный VIN номер!")
-        return vin.upper()
-        
-            
+        vin = vin.upper()
+        current_year = datetime.datetime.today().year
+        year_of_issue = cleaned_data.get("year_of_issue")
+        if year_of_issue > current_year or year_of_issue < 1920:
+            raise forms.ValidationError("Некорректная дата!")
+        return cleaned_data
+
 
 class AddOrderForm(forms.ModelForm):
     class Meta:
         model = CarHistory
         fields = ["car", "description_repair"]
-    
+
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user')
         super().__init__(*args, **kwargs)

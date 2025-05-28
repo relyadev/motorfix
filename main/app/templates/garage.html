@@ -1,33 +1,168 @@
 {% extends 'base.html' %}
+{% load widget_tweaks %}
 
 {% block content %}
-  <br />
+<main class="container mx-auto px-4 pt-12">
+    <!-- Кнопка добавления автомобиля -->
+    <div class="text-center mb-8">
+        <button onclick="openModal('addModal')" class="btn-primary inline-flex items-center mx-auto">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Добавить автомобиль
+        </button>
+    </div>
 
-  <form action="{% url 'add_car' %}" method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Добавить</button>
-  </form>
-  {% if cars %}
-  {% for i in cars %}
-  <hr>
-    <ul>
-      <li>Марка: {{ i.brand }}</li>
-      <li>Год выпуска: {{ i.year_of_issue }}</li>
-      <li>Пробег: {{ i.mileage }}</li>
-      <li>VIN: {{ i.VIN }}</li>
-      <img src="http://{{ request.get_host }}/uploads/{{ i.image_car }}" alt="" />
-      <form action="{% url 'car_delete' i.id %}" method="POST">
-        {% csrf_token %}
-        <button type="submit">Удалить автомобиль</button>
-      </form>
-      <form action="{% url 'car_update' i.id%}">
-        <button type="submit">Обновить автомобиль</button>
-      </form>
-    </ul>
-  {% endfor %}
-  {% else %}
-  <h2>Нет машин:(</h2>
-  {% endif %}
+    
+    <!-- Модальное окно добавления -->
+    <div id="addModal" class="fixed inset-0 bg-black/50 z-50 hidden overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen">
+            <div class="bg-[#2A2A2A] rounded-xl p-8 max-w-md w-full mx-4 relative max-h-[90vh] overflow-y-auto">
+                <h3 class="text-2xl font-bold text-[#FF9920] mb-6">Добавить автомобиль</h3>
+                <form action="{% url 'add_car' %}" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="space-y-4">
+                        {% for field in form %}
+                        <div>
+                            <label for="{{ field.id_for_label }}" class="block text-gray-300 mb-1">{{ field.label }}</label>
+
+                            {% if field.name == "image_car" %}
+                                {{ field|add_class:"hidden" }}  {# скрываем input[type=file] #}
+                                <label for="{{ field.id_for_label }}"
+                                       class="block w-full cursor-pointer px-4 py-2 bg-[#1E1E1E] border border-gray-600 text-gray-300 rounded-md text-center hover:border-[#FF9920] transition">
+                                    Выберите изображение
+                                </label>
+                                <div id="preview-container" class="mt-2">
+                                    <img id="image-preview" src="#" alt="Превью" class="w-full h-48 object-cover rounded-md hidden" />
+                                </div>
+                            {% else %}
+                                {{ field|add_class:"bg-[#1E1E1E] border border-gray-600 rounded-md px-3 py-2 text-gray-200 w-full focus:outline-none focus:ring-2 focus:ring-[#FF9920]" }}
+                            {% endif %}
+
+                            {% if field.errors %}
+                                <p class="text-red-500 text-sm mt-1">{{ field.errors }}</p>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="mt-6 flex justify-end space-x-3">
+                        <button type="button" onclick="closeModal('addModal')" class="text-gray-400 hover:text-gray-300">
+                            Отмена
+                        </button>
+                        <button type="submit" class="btn-primary">Сохранить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Список автомобилей -->
+    {% if cars %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for i in cars %}
+        <div class="bg-[#2A2A2A] rounded-xl p-6 hover:transform hover:scale-[1.02] transition-all">
+            <div class="mb-4">
+                <img src="{{ i.image_car.url }}" alt="{{ i.brand }}" class="w-full h-48 object-cover rounded-lg">
+            </div>
+            <div class="space-y-2">
+                <p class="text-[#FF9920] font-medium">{{ i.brand }}</p>
+                <div class="text-gray-400 text-sm">
+                    <p>Год выпуска: {{ i.year_of_issue }}</p>
+                    <p>Пробег: {{ i.mileage }} км</p>
+                    <p>VIN: {{ i.VIN }}</p>
+                </div>
+            </div>
+            <div class="mt-6 flex space-x-3">
+                <form action="{% url 'car_delete' i.id %}" method="POST" onsubmit="return confirm('Удалить автомобиль?')">
+                    {% csrf_token %}
+                    <button type="submit" class="text-red-500 hover:text-red-400 text-sm">Удалить</button>
+                </form>
+                <button onclick="openEditModal('{{ i.id }}')" class="text-[#FF9920] hover:text-[#FFAA40] text-sm">Редактировать</button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Модальное окно редактирования -->
+    <div id="editModal" class="fixed inset-0 bg-black/50 z-50 hidden overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen">
+            <div class="bg-[#2A2A2A] rounded-xl p-8 max-w-md w-full mx-4 relative max-h-[90vh] overflow-y-auto">
+                <h3 class="text-2xl font-bold text-[#FF9920] mb-6">Редактировать автомобиль</h3>
+                <form id="editForm" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="space-y-4">
+                        {% for field in form %}
+                        <div>
+                            <label for="{{ field.id_for_label }}" class="block text-gray-300 mb-1">{{ field.label }}</label>
+                            {{ field|add_class:"bg-[#1E1E1E] border border-gray-600 rounded-md px-3 py-2 text-gray-200 w-full focus:outline-none focus:ring-2 focus:ring-[#FF9920]" }}
+                            {% if field.errors %}
+                                <p class="text-red-500 text-sm mt-1">{{ field.errors }}</p>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="mt-6 flex justify-end space-x-3">
+                        <button type="button" onclick="closeModal('editModal')" class="text-gray-400 hover:text-gray-300">
+                            Отмена
+                        </button>
+                        <button type="submit" class="btn-primary">Обновить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+    <div class="text-center py-12">
+        <p class="text-gray-500 text-lg">Нет добавленных автомобилей</p>
+    </div>
+    {% endif %}
+</main>
+
+<script>
+    // Модалки
+    function openModal(id) {
+        document.getElementById(id).classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+    }
+
+    function closeModal(id) {
+        document.getElementById(id).classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+    }
+
+    function openEditModal(carId) {
+        document.getElementById('editForm').action = `/car_update/${carId}/`;
+        openModal('editModal');
+    }
+
+    window.onclick = function (event) {
+        if (event.target.classList.contains('fixed')) {
+            event.target.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }
+    }
+
+    // Предпросмотр изображения
+    const fileInput = document.querySelector('input[type="file"]');
+    const previewImage = document.getElementById('image-preview');
+    const previewContainer = document.getElementById('preview-container');
+
+    if (fileInput) {
+        fileInput.addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    previewImage.src = event.target.result;
+                    previewImage.classList.remove('hidden');
+                }
+                reader.readAsDataURL(file);
+            } else {
+                previewImage.classList.add('hidden');
+                previewImage.src = '';
+            }
+        });
+    }
+</script>
 {% endblock %}
-

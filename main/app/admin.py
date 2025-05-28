@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from app.models import Car, CarHistory, Client
+from app.views import send_email
 
 class CustomUserAdmin(UserAdmin):
     list_display = ('email', 'is_staff', 'is_active')
@@ -18,6 +19,13 @@ class CustomUserAdmin(UserAdmin):
     search_fields = ('email',)
     ordering = ('email',)
 
+@admin.register(CarHistory)
+class CarHistoryAdmin(admin.ModelAdmin):
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        if change:
+            send_email("edit_status.html", {"order": obj}, "Изменен статус ремонта", obj.car.user)
+            
 admin.site.register(Client, CustomUserAdmin)
 admin.site.register(Car)
-admin.site.register(CarHistory)
+# admin.site.register(CarHistory)

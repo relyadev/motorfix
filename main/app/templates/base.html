@@ -1,19 +1,136 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  </head>
-  <body>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Автосервис{% endblock %}</title>
 
-    <a style="color: red;" href="{% url 'main' %}">Главная</a>
-    <a style="color: red;" href="{% url 'garage' %}">Гараж</a>
-    <a style="color: red;" href="{% url 'history' %}">История</a>
-    <a style="color: red;" href="{% url 'order' %}">Запись</a>
-    <hr>
-    {% block content %}
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#FF9920',
+                        dark: '#1F1F1F',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    {% endblock %}
-  </body>
+    <!-- Иконки -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        // Улучшенная функция для определения активной вкладки
+        function setActiveTab() {
+            const currentPath = window.location.pathname;
+            const navItems = document.querySelectorAll('[data-nav-item]');
+
+            navItems.forEach(item => {
+                // Получаем путь без слэшей на концах
+                const itemPath = item.getAttribute('data-path').replace(/\/+$/, '');
+                const cleanCurrentPath = currentPath.replace(/\/+$/, '');
+
+                // Для главной страницы проверяем точное соответствие
+                if (itemPath === '{% url "main" %}'.replace(/\/+$/, '') ||
+                    itemPath === '{% url "main" %}') {
+                    if (cleanCurrentPath === '{% url "main" %}'.replace(/\/+$/, '') ||
+                        cleanCurrentPath === '') {
+                        item.classList.add('text-primary');
+                        item.querySelector('i').classList.add('text-primary');
+                    } else {
+                        item.classList.remove('text-primary');
+                        item.querySelector('i').classList.remove('text-primary');
+                    }
+                }
+                // Для остальных страниц
+                else {
+                    if (cleanCurrentPath === itemPath) {
+                        item.classList.add('text-primary');
+                        item.querySelector('i').classList.add('text-primary');
+                    } else {
+                        item.classList.remove('text-primary');
+                        item.querySelector('i').classList.remove('text-primary');
+                    }
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', setActiveTab);
+        window.addEventListener('resize', setActiveTab);
+    </script>
+</head>
+<body class="bg-dark text-gray-200 font-sans min-h-screen flex flex-col">
+    <!-- Шапка только для десктопа -->
+    <header class="hidden md:block bg-dark/90 backdrop-blur-sm border-b border-gray-800 sticky top-0 z-50">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <!-- Логотип -->
+                <div class="flex-shrink-0 flex items-center">
+                    <a href="{% url 'main' %}" class="text-primary font-bold text-2xl tracking-tight">
+                        <i class="fas fa-car mr-2"></i>AUTO<span class="text-white">SERVICE</span>
+                    </a>
+                </div>
+
+                <!-- Десктопное меню -->
+                <div class="flex items-center space-x-2">
+                    <a href="{% url 'main' %}" class="px-4 py-2 rounded-lg hover:bg-gray-800/50 transition-all font-medium flex items-center text-gray-400"
+                       data-nav-item data-path="{% url 'main' %}">
+                        <i class="fas fa-home mr-2"></i> Главная
+                    </a>
+                    <a href="{% url 'garage' %}" class="px-4 py-2 rounded-lg hover:bg-gray-800/50 transition-all font-medium flex items-center text-gray-400"
+                       data-nav-item data-path="{% url 'garage' %}">
+                        <i class="fas fa-warehouse mr-2"></i> Гараж
+                    </a>
+                    <a href="{% url 'history' %}" class="px-4 py-2 rounded-lg hover:bg-gray-800/50 transition-all font-medium flex items-center text-gray-400"
+                       data-nav-item data-path="{% url 'history' %}">
+                        <i class="fas fa-history mr-2"></i> История
+                    </a>
+                    <a href="{% url 'order' %}" class="px-4 py-2 rounded-lg hover:bg-gray-800/50 transition-all font-medium flex items-center text-gray-400"
+                       data-nav-item data-path="{% url 'order' %}">
+                        <i class="fas fa-calendar-check mr-2"></i> Запись
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Основной контент -->
+    <main class="flex-grow pb-16 md:pb-0"> <!-- Отступ для мобильной навигации -->
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Мобильная навигация внизу -->
+    <div class="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 z-50 md:hidden">
+        <div class="grid grid-cols-4 gap-1">
+            <a href="{% url 'main' %}" class="flex flex-col items-center justify-center py-3 text-xs text-gray-400 hover:bg-gray-800/50 transition"
+               data-nav-item data-path="{% url 'main' %}">
+                <i class="fas fa-home text-lg mb-1"></i>
+                <span>Главная</span>
+            </a>
+            <a href="{% url 'garage' %}" class="flex flex-col items-center justify-center py-3 text-xs text-gray-400 hover:bg-gray-800/50 transition"
+               data-nav-item data-path="{% url 'garage' %}">
+                <i class="fas fa-warehouse text-lg mb-1"></i>
+                <span>Гараж</span>
+            </a>
+            <a href="{% url 'history' %}" class="flex flex-col items-center justify-center py-3 text-xs text-gray-400 hover:bg-gray-800/50 transition"
+               data-nav-item data-path="{% url 'history' %}">
+                <i class="fas fa-history text-lg mb-1"></i>
+                <span>История</span>
+            </a>
+            <a href="{% url 'order' %}" class="flex flex-col items-center justify-center py-3 text-xs text-gray-400 hover:bg-gray-800/50 transition"
+               data-nav-item data-path="{% url 'order' %}">
+                <i class="fas fa-calendar-check text-lg mb-1"></i>
+                <span>Запись</span>
+            </a>
+        </div>
+    </div>
+</body>
 </html>

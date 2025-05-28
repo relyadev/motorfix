@@ -10,13 +10,20 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
+
+def handler404(request, exception):
+    return render(request, 'errors/404.html', status=404)
+
+def handler403(request, exception):
+    return render(request, 'errors/403.html', status=403)
+
 def send_email(template_name, context, subject, user):
     html_content = render_to_string(
         f"emails/{template_name}",
         context = context,
     )
     text_content = strip_tags(html_content)
-    
+
     msg = EmailMultiAlternatives(
         subject=subject,
         body=text_content,
@@ -25,7 +32,7 @@ def send_email(template_name, context, subject, user):
     )
     msg.attach_alternative(html_content, "text/html")
     msg.send()
-    
+
 class EmailLogin(LoginView):
     form_class = LoginForm
     template_name = "registration/login.html"
@@ -38,7 +45,7 @@ def registration(req: HttpRequest):
             user.set_password(form.cleaned_data.get("password"))
             user.save()
             return redirect("login")
-        
+
     form = RegistrationForm()
     return render(req, 'registration/registration.html', {"form": form})
 
@@ -102,5 +109,7 @@ def make_order(req: HttpRequest):
         car = form.save(commit=False)
         car.user = req.user
         car.save()
-    send_email("mail_new_order.html", {"order": car}, "Новая заявка", req.user)
+    print(req.get_host())
+    send_email("mail_new_order.html", {"order": car, "host_url": req.get_host()}, "Новая заявка", req.user)
+    # send_email("mail_new_order.html", {"order": car}, "Новая заявка", "email_admin")
     return redirect("history")

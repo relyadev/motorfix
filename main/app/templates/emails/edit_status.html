@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Новая заявка!</title>
+    <title></title>
 </head>
 <body>
-    <h1 style="color: red;">{{ order.car.brand }}</h1>
+    <h1 style="color: red;">Сменился статус ремонта у {{ order.car.brand }}</h1>
+    <h2>Текущий статус: {{ order.status }}</h2>
     <p>VIN: {{ order.car.VIN }}</p>
     <p>Причина обращения: {{ order.description_repair }}</p>
     <p>Дата обращения: {{ order.date_of_repair }}</p>
-    <p>Ссылка на обращение: <a href="http://{{ host_url }}/admin/app/carhistory/{{ order.id }}/change">перейти</a></p>
 </body>
 </html>
